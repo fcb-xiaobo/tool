@@ -1,0 +1,27 @@
+#redis1:
+#  hosts: 10.191.80.157:7000,10.191.80.157:7001,10.191.80.157:7002,10.191.80.157:7003,10.191.80.157:7004,10.191.80.157:7005
+#
+#redis2:
+#  hosts: 10.191.80.173:6830, 10.191.80.173:6831, 10.191.80.173:6832,  10.191.80.173:6833, 10.191.80.173:6834, 10.191.80.173:6835
+#
+
+
+redis1:
+  hosts: 10.35.5.202:6379,10.35.5.203:6380,10.35.5.203:6379,10.35.2.112:6380,10.35.2.112:6379,10.35.5.202:6380
+
+redis2:
+  hosts: 10.35.5.202:7200,10.35.5.202:7203,10.35.2.112:7202,10.35.5.203:7201,10.35.5.203:7204,10.35.2.112:7205
+
+
+# sr
+sr:
+  jdbc-url : jdbc:mysql://10.35.5.58:9030/cube_2?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&useCursorFetch=true
+  load-url : 10.35.5.58:8030
+  user-name : root
+  password : 123456
+
+#sr:
+#  jdbc-url : jdbc:mysql://10.191.80.158:9030/cube_1?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+#  load-url : 10.191.80.158:8030
+#  user-name : root
+#  password :

@@ -38,7 +38,7 @@ public class ExecuteRun implements CommandLineRunner {
         String table=args[1];
         String appId=args[2];
         int size=Integer.parseInt(args[3]);
-        Map<String,String> dataMap=new HashMap<>();
+        Map<String,String> dataMap=new HashMap<>(5000);
         String printS=String.format("db [ %s ] ,table [ %s ],appid [ %s ] ,size [ %d ]",db,table,appId,size);
         System.out.println(printS);
         String tableinfo=db+"."+table;
@@ -86,19 +86,28 @@ public class ExecuteRun implements CommandLineRunner {
                 dataMap.clear();
                 break;
             }
-//            case "role_dict_meta":{
-//                starRocksJdbcUtil.streamQuery("SELECT * FROM "+db+"."+table+" where app_id = "+appId, size, rs -> {
-//                    JSONObject json=new JSONObject();
-//                    String[] uniqueKey = rs.getString("role_id").split("#");
-//                    json.put("has_init",rs.getBoolean("has_init"));
-//                    json.put("first_event",JSONObject.parseObject(rs.getString("first_event")));
-//                    json.put("first_field",JSONObject.parseObject(rs.getString("first_field")));
-//                    json.put("event_append",JSONObject.parseObject(rs.getString("event_append")));
-//                    String redisKey=String.format("c#role#%s#%s#%s",appId,uniqueKey[0],uniqueKey[1]);
-//                    dataMap.put(redisKey, json.toString());
-//                });
-//                break;
-//            }
+            case "role_dict_meta":{
+                starRocksJdbcUtil.streamQuery(tableinfo, size, rs -> {
+                    JSONObject json=new JSONObject();
+                    String[] uniqueKey = rs.getString("role_id").split("#");
+                    json.put("has_init",rs.getBoolean("has_init"));
+                    json.put("first_event",JSONObject.parseObject(rs.getString("first_event")));
+                    json.put("first_field",JSONObject.parseObject(rs.getString("first_field")));
+                    json.put("event_append",JSONObject.parseObject(rs.getString("event_append")));
+                    String redisKey=String.format("c#role#%s#%s#%s",appId,uniqueKey[0],uniqueKey[1]);
+                    dataMap.put(redisKey,json.toJSONString());
+                    if(dataMap.size()==5000){
+                        redisCompressionUtil.setBatchWithZstd(dataMap);
+                        log.info("role write ok ,size  "+ dataMap.size());
+                        dataMap.clear();
+                    }
+                });
+                redisCompressionUtil.setBatchWithZstd(dataMap);
+                log.info("role last batch ok ,size  "+ dataMap.size());
+                dataMap.clear();
+                break;
+
+            }
             default:
                 break;
         }
